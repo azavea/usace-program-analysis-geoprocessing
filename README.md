@@ -43,6 +43,10 @@ Alternatively, using `curl`:
     $ curl http://localhost:8090/ping
     OK
 
+## Test with Web App
+
+To test with the [main web app](https://github.com/azavea/usace-program-analysis), build the JAR and copy it to the [`/src/geoprocessing`](https://github.com/azavea/usace-program-analysis/tree/develop/src/geoprocessing) directory, and uncomment the volume mapping in [`docker-compose.yml`](https://github.com/azavea/usace-program-analysis/blob/develop/docker-compose.yml#L69-L71). Then run `docker-compose up`.
+
 ## Deploy
 
 Deployments to GitHub Releases are handled via [Travis-CI](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing). The following `git-flow` commands signal to Travis that we want to create a release. The `version` variable should be updated in `project/Version.scala.`
