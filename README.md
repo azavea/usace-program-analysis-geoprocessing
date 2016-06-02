@@ -42,3 +42,25 @@ Alternatively, using `curl`:
 
     $ curl http://localhost:8090/ping
     OK
+
+## Deploy
+
+Deployments to GitHub Releases are handled via [Travis-CI](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing). The following `git-flow` commands signal to Travis that we want to create a release. The `version` variable should be updated in `project/Version.scala.`
+
+``` bash
+$ git flow release start 0.0.1
+$ vim CHANGELOG.md
+$ vim project/Version.scala
+$ git commit -m "0.0.1"
+$ git flow release publish 0.0.1
+$ git flow release finish 0.0.1
+```
+
+You should now check the `develop` and `master` branches on Github to make sure that they look correct.  In particular, they should both contain the changes that you made to `CHANGELOG.md`.  If they do not, then the following two steps may also be required:
+
+```bash
+$ git push origin develop:develop
+$ git push origin master:master
+```
+
+To actually kick off the deployment, ensure that the newly created Git tags are pushed remotely with `git push --tags`.
