@@ -16,7 +16,7 @@ script:
 
 before_deploy:
   - docker-compose -f docker-compose.ci.yml run assembly
-  - sudo chown ${USER} geop/target/scala-2.10/usace-programanalysis-geop-assembly-${TRAVIS_TAG}.jar
+  - sudo chown ${USER} geop/target/scala-2.10/usace-programanalysis-geop-assembly-*.jar
 
 deploy:
   - provider: releases
