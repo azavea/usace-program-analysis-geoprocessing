@@ -1,6 +1,6 @@
 sudo: required
 
-language: python
+language: bash
 
 services:
   - docker
@@ -10,8 +10,8 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 
-install:
-  - pip install docker-compose
+# install:
+#   - pip install docker-compose
 
 script:
   - mkdir -p ${HOME}/.sbt
