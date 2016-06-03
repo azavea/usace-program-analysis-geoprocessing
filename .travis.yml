@@ -10,8 +10,8 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 
-# install:
-#   - pip install docker-compose
+install:
+  - docker-compose --version
 
 script:
   - mkdir -p ${HOME}/.sbt
