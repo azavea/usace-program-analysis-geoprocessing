@@ -1,0 +1,29 @@
+version: '2'
+services:
+  assembly:
+    image: quay.io/azavea/spark:1.6.1
+    volumes:
+      - ./:/usace-program-analysis-geoprocessing
+      - ${HOME}/.ivy2:/root/.ivy2
+      - ${HOME}/.sbt:/root/.sbt
+    working_dir: /usace-program-analysis-geoprocessing
+    entrypoint: sbt
+    command: '"project geop" assembly'
+
+  compile:
+    image: quay.io/azavea/spark:1.6.1
+    volumes:
+      - ./:/usace-program-analysis-geoprocessing
+      - ${HOME}/.ivy2:/root/.ivy2
+      - ${HOME}/.sbt:/root/.sbt
+    working_dir: /usace-program-analysis-geoprocessing
+    entrypoint: sbt
+    command: '"project geop" compile'
+
+  release:
+    image: program-analysis-geoprocessing:${QUAY_TAG}
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - TRAVIS_TAG

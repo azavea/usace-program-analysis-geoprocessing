@@ -1,6 +1,6 @@
 sudo: required
 
-language: scala
+language: python
 
 services:
   - docker
@@ -10,21 +10,34 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 
+install:
+  - pip install docker-compose
+
 script:
   - mkdir -p ${HOME}/.sbt
-  - docker run -v ${HOME}/.ivy2:/root/.ivy2 -v ${HOME}/.sbt:/root/.sbt -v ${PWD}:/usace-program-analysis-geoprocessing -w /usace-program-analysis-geoprocessing quay.io/azavea/spark:latest ./sbt "project geop" compile
+  - docker-compose -f docker-compose.ci.yml run compile
 
 before_deploy:
-  - docker run -v ${HOME}/.ivy2:/root/.ivy2 -v ${HOME}/.sbt:/root/.sbt -v ${PWD}:/usace-program-analysis-geoprocessing -w /usace-program-analysis-geoprocessing quay.io/azavea/spark:latest ./sbt "project geop" assembly
+  - docker-compose -f docker-compose.ci.yml run assembly
   - sudo chown ${USER} geop/target/scala-2.10/usace-programanalysis-geop-assembly-${TRAVIS_TAG}.jar
 
 deploy:
-  provider: releases
-  api_key:
-    secure: Kueq5wDVSor5lP9QuCouCu4tDd6TL7O1J3d9mISrYlM6PK3C1Z72cr9kxtySW+BOYYAI//J9SK3taXKNhHce7rZNdtJADyKaz8bMZ88NIKLPqujJxIXlyAmPURSXBLn2HZ9h8FjIqIw5240jFrPInDPJq2S8KiJsyEPSmI//zFUc7v32aId1XWAeRFRBGQyYiIngsrFAZ1csmwS7UlBxdl3moTZNvekgnYnYZ1GnJxaZClMa/Ii9seqHQCPtu/a7eye5WigI62rJ5a6WcLqL2/Ffx17o089TArYdLHXyfMMAsjImnNF7Lk+kMo3ybZI5u6/icL3zOY8mkn6zQxeCXTc7fwkTzSxLeIoDuoWASHJhkNrFQKg+ZsowpYefGsYv076bYkg+YtckWsIjWyNknuTkkDF5dKxLHZvffn6RmYjikbUbHo6J52q1nTFCvi6rhPU2ossIDiWjLUGRKUF6X9n9DKaFdthFj99ECsfF56zWvgcS1SSDdPmWh1r8v4oNr8I7ow9HqpOtye1XglRc4zNHHs8mjUueGCJOqOc2NZ15aMGrL8KIqTQzEDtw/ve6Fai3pmk4t8z6r2PyVZJL2RlPXfpmHlQL3JErW+hbtGNmLpP2QTVF2kz2OJkXNRZwIAY+wMX5Enw4tI447rBnfW+SPYJff/YxntoBLLJCKqo=
-  file:
-    - geop/target/scala-2.10/usace-programanalysis-geop-assembly-${TRAVIS_TAG}.jar
-  skip_cleanup: true
-  on:
-    repo: azavea/usace-program-analysis-geoprocessing
-    tags: true
+  - provider: releases
+    api_key:
+      secure: Kueq5wDVSor5lP9QuCouCu4tDd6TL7O1J3d9mISrYlM6PK3C1Z72cr9kxtySW+BOYYAI//J9SK3taXKNhHce7rZNdtJADyKaz8bMZ88NIKLPqujJxIXlyAmPURSXBLn2HZ9h8FjIqIw5240jFrPInDPJq2S8KiJsyEPSmI//zFUc7v32aId1XWAeRFRBGQyYiIngsrFAZ1csmwS7UlBxdl3moTZNvekgnYnYZ1GnJxaZClMa/Ii9seqHQCPtu/a7eye5WigI62rJ5a6WcLqL2/Ffx17o089TArYdLHXyfMMAsjImnNF7Lk+kMo3ybZI5u6/icL3zOY8mkn6zQxeCXTc7fwkTzSxLeIoDuoWASHJhkNrFQKg+ZsowpYefGsYv076bYkg+YtckWsIjWyNknuTkkDF5dKxLHZvffn6RmYjikbUbHo6J52q1nTFCvi6rhPU2ossIDiWjLUGRKUF6X9n9DKaFdthFj99ECsfF56zWvgcS1SSDdPmWh1r8v4oNr8I7ow9HqpOtye1XglRc4zNHHs8mjUueGCJOqOc2NZ15aMGrL8KIqTQzEDtw/ve6Fai3pmk4t8z6r2PyVZJL2RlPXfpmHlQL3JErW+hbtGNmLpP2QTVF2kz2OJkXNRZwIAY+wMX5Enw4tI447rBnfW+SPYJff/YxntoBLLJCKqo=
+    file:
+      - geop/target/scala-2.10/usace-programanalysis-geop-assembly-${TRAVIS_TAG}.jar
+    skip_cleanup: true
+    on:
+      repo: azavea/usace-program-analysis-geoprocessing
+      tags: true
+  - provider: script
+    script: "scripts/cibuild.sh"
+    on:
+      repo: azavea/usace-program-analysis-geoprocessing
+      branch: feature/hmc/docker
+  - provider: script
+    script: "scripts/cibuild.sh"
+    on:
+      repo: azavea/usace-program-analysis-geoprocessing
+      tags: true
