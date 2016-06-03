@@ -10,9 +10,6 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 
-install:
-  - docker-compose --version
-
 script:
   - mkdir -p ${HOME}/.sbt
   - docker-compose -f docker-compose.ci.yml run compile
