@@ -2,7 +2,7 @@ FROM quay.io/azavea/spark:1.6.1
 
 ENV VERSION 0.1.0
 
-COPY usace-programanalysis-geop-assembly-${VERSION}.jar /opt/geoprocessing/
+COPY geop/target/scala-2.10/usace-programanalysis-geop-assembly-${VERSION}.jar /opt/geoprocessing/
 
 WORKDIR /opt/geoprocessing
 

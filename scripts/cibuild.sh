@@ -9,7 +9,7 @@ else
     QUAY_TAG="${TRAVIS_TAG}"
 fi
 
-docker build -t "quay.io/usace/program-analysis-geoprocessing:${QUAY_TAG}" docker
+docker build -t "quay.io/usace/program-analysis-geoprocessing:${QUAY_TAG}" .
 
 docker push "quay.io/usace/program-analysis-geoprocessing:${QUAY_TAG}"
 docker tag -f "quay.io/usace/program-analysis-geoprocessing:${QUAY_TAG}" "quay.io/usace/program-analysis-geoprocessing:latest"
