@@ -30,11 +30,13 @@ deploy:
       tags: true
   - provider: script
     script: "scripts/cibuild.sh"
+    skip_cleanup: true
     on:
       repo: azavea/usace-program-analysis-geoprocessing
       branch: feature/hmc/docker
   - provider: script
     script: "scripts/cibuild.sh"
+    skip_cleanup: true
     on:
       repo: azavea/usace-program-analysis-geoprocessing
       tags: true
