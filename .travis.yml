@@ -17,8 +17,8 @@ script:
 before_deploy:
   - docker login -e . -p "${QUAY_PASSWORD}" -u "${QUAY_USER}" quay.io
   - docker-compose -f docker-compose.ci.yml run assembly
+  - sudo chown ${USER} geop/target/scala-2.10/usace-programanalysis-geop-assembly-*.jar
   - mv geop/target/scala-2.10/usace-programanalysis-geop-assembly-*.jar docker/
-  - sudo chown ${USER} docker/usace-programanalysis-geop-assembly-*.jar
 
 deploy:
   - provider: releases
