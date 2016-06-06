@@ -8,4 +8,6 @@ WORKDIR /opt/geoprocessing
 
 EXPOSE 8090
 
+VOLUME /tmp
+
 ENTRYPOINT ["/bin/bash", "-c", "spark-submit /opt/geoprocessing/usace-programanalysis-geop-assembly-${VERSION}.jar"]
