@@ -1,2 +1,3 @@
 *
 !geop/target/scala-2.10/*.jar
+!scripts/docker-entrypoint.sh

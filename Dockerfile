@@ -2,7 +2,8 @@ FROM quay.io/azavea/spark:1.6.1
 
 ENV VERSION 0.1.0
 
-COPY geop/target/scala-2.10/usace-programanalysis-geop-assembly-${VERSION}.jar /opt/geoprocessing/
+COPY geop/target/scala-2.10/usace-programanalysis-geop-assembly-${VERSION}.jar /opt/geoprocessing/usace-programanalysis-geop.jar
+COPY scripts/docker-entrypoint.sh /opt/geoprocessing/
 
 WORKDIR /opt/geoprocessing
 
@@ -10,4 +11,4 @@ EXPOSE 8090
 
 VOLUME /tmp
 
-ENTRYPOINT ["/bin/bash", "-c", "spark-submit /opt/geoprocessing/usace-programanalysis-geop-assembly-${VERSION}.jar"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
