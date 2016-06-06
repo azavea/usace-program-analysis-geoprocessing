@@ -49,12 +49,13 @@ To test with the [main web app](https://github.com/azavea/usace-program-analysis
 
 ## Deploy
 
-Deployments to GitHub Releases are handled via [Travis-CI](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing). The following `git-flow` commands signal to Travis that we want to create a release. The `version` variable should be updated in `project/Version.scala.`
+Deployments to [GitHub Releases](https://github.com/azavea/usace-program-analysis-geoprocessing/releases) and [Quay](https://quay.io/repository/usace/program-analysis-geoprocessing) are handled via [Travis-CI](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing). The following `git-flow` commands signal to Travis that we want to create a release. The `version` variable should be updated in `project/Version.scala` and `Dockerfile`.
 
 ``` bash
 $ git flow release start 0.0.1
 $ vim CHANGELOG.md
 $ vim project/Version.scala
+$ vim Dockerfile
 $ git commit -m "0.0.1"
 $ git flow release publish 0.0.1
 $ git flow release finish 0.0.1
