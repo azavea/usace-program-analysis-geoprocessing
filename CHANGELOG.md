@@ -1,3 +1,7 @@
+## 0.1.1
+
+ - Release containerized image with /count endpoint.
+
 ## 0.1.0
 
  - Deploy containerized image to [Quay](https://quay.io/repository/usace/program-analysis-geoprocessing) in addition to GitHub Releases
