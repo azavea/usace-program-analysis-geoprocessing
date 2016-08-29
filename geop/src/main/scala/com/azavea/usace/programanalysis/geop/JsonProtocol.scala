@@ -13,18 +13,26 @@ import scala.collection.parallel.immutable.ParVector
 
 
 // TODO Nest under "input"
-case class CountArgs (rasters: Seq[LayerId], multiPolygons: ParVector[MultiPolygon])
+case class CountArgs (
+  rasters: Seq[LayerId],
+  multiPolygons: ParVector[MultiPolygon]
+)
 
 object JsonProtocol extends SprayJsonSupport with GeoJsonSupport {
   implicit object CountArgsJsonFormat extends RootJsonFormat[CountArgs] {
-    def write(args: CountArgs) = JsObject(
-      "zoom" -> JsNumber(args.rasters.head.zoom),
-      "rasters" -> JsArray(args.rasters.map(r => JsString(r.name)).toVector),
-      "multiPolygons" -> JsArray(args.multiPolygons.map(m => JsString(m.toGeoJson())).toVector)
-    )
+    def write(args: CountArgs) = args match {
+      case CountArgs(rasters, multiPolygons) =>
+        JsObject(
+          "zoom" -> JsNumber(rasters.head.zoom),
+          "rasters" -> JsArray(rasters.map(r => JsString(r.name)).toVector),
+          "multiPolygons" -> JsArray(multiPolygons.map(m => JsString(m.toGeoJson())).toVector)
+        )
+      case _ =>
+        throw new SerializationException("")
+    }
 
     def read(value: JsValue) = {
-      value.asJsObject.getFields("zoom", "rasters", "multiPolygons") match {
+      value.asJsObject.getFields("zoom", "rasters", "multiPolygons", "lat", "lng") match {
         case Seq(JsNumber(zoom), JsArray(rasters), JsArray(multiPolygons)) =>
           new CountArgs(
             rasters.map { r => LayerId(r.convertTo[String], zoom.toInt) },
