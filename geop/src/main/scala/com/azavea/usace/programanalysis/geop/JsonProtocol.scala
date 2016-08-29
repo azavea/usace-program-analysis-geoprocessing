@@ -9,9 +9,11 @@ import spray.httpx.SprayJsonSupport
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
+import scala.collection.parallel.immutable.ParVector
+
 
 // TODO Nest under "input"
-case class CountArgs (rasters: Seq[LayerId], multiPolygons: Seq[MultiPolygon])
+case class CountArgs (rasters: Seq[LayerId], multiPolygons: ParVector[MultiPolygon])
 
 object JsonProtocol extends SprayJsonSupport with GeoJsonSupport {
   implicit object CountArgsJsonFormat extends RootJsonFormat[CountArgs] {
@@ -26,7 +28,7 @@ object JsonProtocol extends SprayJsonSupport with GeoJsonSupport {
         case Seq(JsNumber(zoom), JsArray(rasters), JsArray(multiPolygons)) =>
           new CountArgs(
             rasters.map { r => LayerId(r.convertTo[String], zoom.toInt) },
-            multiPolygons.map { m => m.convertTo[String].parseGeoJson[MultiPolygon] }
+            new ParVector[MultiPolygon](multiPolygons.map { m => m.convertTo[String].parseGeoJson[MultiPolygon] })
           )
         case _ =>
           throw new DeserializationException("Bad Count Arguments")
