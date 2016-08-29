@@ -46,16 +46,17 @@ class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
       entity(as[CountArgs]) { args =>
         complete {
           future {
-            val multiPolygon = args.multiPolygon.reproject(LatLng, ConusAlbers)
-            val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
-            val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
+            args.multiPolygons.par.map(m => {
+                val multiPolygon = m.reproject(LatLng, ConusAlbers)
+                val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
+                val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
 
-            JsObject(
-              rasterGroupedCount
-                .map { case (keys, count) =>
-                  keys.mkString(",") -> JsNumber(count)
-                }
-            )
+                JsObject(
+                  rasterGroupedCount
+                    .map { case (keys, count) =>
+                      keys.mkString(",") -> JsNumber(count)
+                    })
+                }).toList
           }
         }
       }
