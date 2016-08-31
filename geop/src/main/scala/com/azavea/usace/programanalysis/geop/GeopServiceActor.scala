@@ -14,6 +14,8 @@ import spray.http.HttpMethods.{DELETE, GET, OPTIONS, POST}
 import spray.json.{JsNumber, JsObject}
 import spray.routing.{Directive0, HttpService, RejectionHandler}
 
+import scala.collection.parallel.immutable.ParVector
+
 
 class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -46,16 +48,17 @@ class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
       entity(as[CountArgs]) { args =>
         complete {
           future {
-            val multiPolygon = args.multiPolygon.reproject(LatLng, ConusAlbers)
-            val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
-            val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
+            args.multiPolygons.map(m => {
+              val multiPolygon = m.reproject(LatLng, ConusAlbers)
+              val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
+              val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
 
-            JsObject(
-              rasterGroupedCount
-                .map { case (keys, count) =>
-                  keys.mkString(",") -> JsNumber(count)
-                }
-            )
+              JsObject(
+                rasterGroupedCount
+                  .map { case (keys, count) =>
+                    keys.mkString(",") -> JsNumber(count)
+                  })
+              }).toVector
           }
         }
       }
