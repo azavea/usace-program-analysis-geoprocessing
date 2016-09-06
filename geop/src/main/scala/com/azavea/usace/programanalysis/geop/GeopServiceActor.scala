@@ -16,7 +16,8 @@ import geotrellis.raster.Tile
 import geotrellis.spark.io.{TileNotFoundError}
 import geotrellis.proj4.{LatLng, ConusAlbers}
 import geotrellis.raster.{IntConstantNoDataCellType}
-import geotrellis.raster.render.{IntColorMap}
+import geotrellis.raster.render.{IntColorMap, ClassBoundaryType, Exact}
+import geotrellis.raster.render.ColorMap.{Options}
 
 
 class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
@@ -28,14 +29,17 @@ class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
   val NLCD_FOREST_COLOR: Int = 0x2B7B3D80
   val NLCD_WETLANDS_COLOR: Int = 0x75A5D080
   val NLCD_DISTURBED_COLOR: Int = 0xFF5D5D80
+  val NLCD_NO_DATA_COLOR: Int = 0xFFFFFF00
 
   val nlcdColorMap =
-    new IntColorMap(Map(
-      41 -> NLCD_FOREST_COLOR, 42 -> NLCD_FOREST_COLOR, 43 -> NLCD_FOREST_COLOR,
-      90 -> NLCD_WETLANDS_COLOR, 95 -> NLCD_WETLANDS_COLOR,
-      21 -> NLCD_DISTURBED_COLOR, 22 -> NLCD_DISTURBED_COLOR, 23 -> NLCD_DISTURBED_COLOR,
-      24 -> NLCD_DISTURBED_COLOR, 81 -> NLCD_DISTURBED_COLOR, 82 -> NLCD_DISTURBED_COLOR
-    ))
+    new IntColorMap(
+      Map(
+        41 -> NLCD_FOREST_COLOR, 42 -> NLCD_FOREST_COLOR, 43 -> NLCD_FOREST_COLOR,
+        90 -> NLCD_WETLANDS_COLOR, 95 -> NLCD_WETLANDS_COLOR,
+        21 -> NLCD_DISTURBED_COLOR, 22 -> NLCD_DISTURBED_COLOR, 23 -> NLCD_DISTURBED_COLOR,
+        24 -> NLCD_DISTURBED_COLOR, 81 -> NLCD_DISTURBED_COLOR, 82 -> NLCD_DISTURBED_COLOR),
+      new Options(classBoundaryType = Exact, noDataColor = NLCD_NO_DATA_COLOR, fallbackColor = NLCD_NO_DATA_COLOR)
+    )
 
   def actorRefFactory = context
   def receive = runRoute(root)
