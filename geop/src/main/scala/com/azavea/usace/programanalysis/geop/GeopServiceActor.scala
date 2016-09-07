@@ -12,12 +12,11 @@ import spray.http.HttpMethods.{DELETE, GET, OPTIONS, POST}
 import spray.json.{JsNumber, JsObject}
 import spray.routing.{Directive0, HttpService, RejectionHandler}
 
-import geotrellis.raster.Tile
-import geotrellis.spark.io.{TileNotFoundError}
 import geotrellis.proj4.{LatLng, ConusAlbers}
-import geotrellis.raster.{IntConstantNoDataCellType}
-import geotrellis.raster.render.{IntColorMap, ClassBoundaryType, Exact}
-import geotrellis.raster.render.ColorMap.{Options}
+import geotrellis.raster.{IntConstantNoDataCellType, Tile}
+import geotrellis.raster.render.{IntColorMap, Exact}
+import geotrellis.raster.render.ColorMap.Options
+import geotrellis.spark.io.{TileNotFoundError, AttributeNotFoundError}
 
 
 class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
@@ -68,15 +67,15 @@ class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
         complete {
           future {
             args.multiPolygons.map(m => {
-                val multiPolygon = m.reproject(LatLng, ConusAlbers)
-                val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
-                val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
+              val multiPolygon = m.reproject(LatLng, ConusAlbers)
+              val rasterLayers = ClippedLayers(args.rasters, multiPolygon, sc)
+              val rasterGroupedCount = RasterGroupedCount(rasterLayers, multiPolygon)
 
-                JsObject(
-                  rasterGroupedCount
-                    .map { case (keys, count) =>
-                      keys.mkString(",") -> JsNumber(count)
-                    })
+              JsObject(
+                rasterGroupedCount
+                  .map { case (keys, count) =>
+                    keys.mkString(",") -> JsNumber(count)
+                  })
             }).toVector
           }
         }
@@ -90,9 +89,9 @@ class GeopServiceActor(sc: SparkContext) extends Actor with HttpService {
           future {
             val result: Option[Tile] =
               try {
-                Some(ClippedLayers(zoom, x, y, sc))
+                Some(LayerReader(zoom, x, y, sc))
               } catch {
-                case _: TileNotFoundError => None
+                case _: AttributeNotFoundError | _: TileNotFoundError => None
               }
 
             result.map { tile =>

@@ -3,7 +3,7 @@ package com.azavea.usace.programanalysis.geop
 import geotrellis.raster.Tile
 import geotrellis.spark.io._
 import geotrellis.spark.{SpatialKey, TileLayerMetadata, _}
-import geotrellis.spark.io.s3.{S3AttributeStore, S3LayerReader, S3ValueReader}
+import geotrellis.spark.io.s3.{S3AttributeStore, S3LayerReader}
 import geotrellis.vector.{Extent, MultiPolygon}
 
 import org.apache.spark.SparkContext
@@ -26,25 +26,11 @@ object ClippedLayers {
     sc: SparkContext
   ): Seq[TileLayerRDD[SpatialKey]] = {
     val extent = multiPolygon.envelope
-    println(multiPolygon.toString)
-    println(extent.toString)
     val rasterLayers = rasterLayerIds.map(rasterLayerId =>
-      queryAndCropLayer(catalog(sc), rasterLayerId, Some(extent))
+      queryAndCropLayer(catalog(sc), rasterLayerId, extent)
     )
 
     rasterLayers
-  }
-
-  def apply(
-    zoom: Int,
-    x: Int,
-    y: Int,
-    sc: SparkContext
-  ): Tile = {
-    val sKey: SpatialKey = SpatialKey(x, y)
-    val rdr = catalog(sc, zoom)
-
-    rdr.read(sKey)
   }
 
   /**
@@ -59,18 +45,11 @@ object ClippedLayers {
   def queryAndCropLayer(
     catalog: S3LayerReader,
     layerId: LayerId,
-    extent: Option[Extent]
+    extent: Extent
   ): TileLayerRDD[SpatialKey] = {
-    extent match {
-      case Some(extent) =>
-        catalog.query[SpatialKey, Tile, TileLayerMetadata[SpatialKey]](layerId)
-          .where(Intersects(extent))
-          .result
-      case None =>
-        catalog.query[SpatialKey, Tile, TileLayerMetadata[SpatialKey]](layerId)
-          .where(Intersects(KeyBounds(SpatialKey(10, 10), SpatialKey(10, 10))))
-          .result
-    }
+    catalog.query[SpatialKey, Tile, TileLayerMetadata[SpatialKey]](layerId)
+      .where(Intersects(extent))
+      .result
   }
 
   /**
@@ -80,9 +59,6 @@ object ClippedLayers {
     */
   def catalog(sc: SparkContext): S3LayerReader =
     catalog("azavea-datahub", "catalog")(sc)
-  
-  def catalog(sc: SparkContext, zoom: Int): Reader[SpatialKey, Tile] =
-    catalog("azavea-datahub", "catalog", zoom)(sc)
 
   /**
     * Given an S3 bucket name and root path, returns a catalog of layers
@@ -100,20 +76,6 @@ object ClippedLayers {
   )(implicit sc: SparkContext): S3LayerReader = {
     val attributeStore = new S3AttributeStore(bucket, rootPath)
     val reader = new S3LayerReader(attributeStore)
-
-    reader
-  }
-
-  
-  def catalog(
-    bucket: String,
-    rootPath: String,
-    zoom: Int
-  )(implicit sc: SparkContext): Reader[SpatialKey, Tile] = {
-    val attributeStore = new S3AttributeStore(bucket, rootPath)
-    val vr = new S3ValueReader(attributeStore)
-    val layer = LayerId("nlcd-zoomed", zoom)
-    val reader: Reader[SpatialKey, Tile] = vr.reader(layer)
 
     reader
   }

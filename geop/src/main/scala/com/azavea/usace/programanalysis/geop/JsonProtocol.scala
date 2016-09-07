@@ -32,7 +32,7 @@ object JsonProtocol extends SprayJsonSupport with GeoJsonSupport {
     }
 
     def read(value: JsValue) = {
-      value.asJsObject.getFields("zoom", "rasters", "multiPolygons", "lat", "lng") match {
+      value.asJsObject.getFields("zoom", "rasters", "multiPolygons") match {
         case Seq(JsNumber(zoom), JsArray(rasters), JsArray(multiPolygons)) =>
           new CountArgs(
             rasters.map { r => LayerId(r.convertTo[String], zoom.toInt) },
