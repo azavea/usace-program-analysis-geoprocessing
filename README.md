@@ -1,6 +1,7 @@
 # USACE Program Analysis Geoprocessing
 
 [![Build Status](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing.png?branch=master)](https://travis-ci.org/azavea/usace-program-analysis-geoprocessing)
+[![Docker Repository on Quay](https://quay.io/repository/usace/program-analysis-geoprocessing/status "Docker Repository on Quay")](https://quay.io/repository/usace/program-analysis-geoprocessing)
 
 This repository contains the backing geoprocessing service for the [USACE Program Analysis web app](https://github.com/azavea/usace-program-analysis). It is a [Spray](https://github.com/spray/spray) based web service that performs geoprocessing operations using [GeoTrellis](https://github.com/geotrellis/geotrellis) and [Apache Spark](http://spark.apache.org/).
 
