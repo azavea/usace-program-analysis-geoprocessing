@@ -1,13 +1,12 @@
 package com.azavea.usace.programanalysis.geop
 
 import geotrellis.raster.Tile
-import geotrellis.spark.io.{Intersects, _}
+import geotrellis.spark.io._
 import geotrellis.spark.{SpatialKey, TileLayerMetadata, _}
 import geotrellis.spark.io.s3.{S3AttributeStore, S3LayerReader}
 import geotrellis.vector.{Extent, MultiPolygon}
 
 import org.apache.spark.SparkContext
-
 
 object ClippedLayers {
   /**
@@ -76,8 +75,8 @@ object ClippedLayers {
     rootPath: String
   )(implicit sc: SparkContext): S3LayerReader = {
     val attributeStore = new S3AttributeStore(bucket, rootPath)
-    val catalog = new S3LayerReader(attributeStore)
+    val reader = new S3LayerReader(attributeStore)
 
-    catalog
+    reader
   }
 }

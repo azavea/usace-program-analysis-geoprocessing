@@ -1,3 +1,6 @@
+## 0.2.0
+ - Release containerized image with /nlcd-agg-tiles endpoint, change to /count endpoint to accept bundled polygon requests.
+
 ## 0.1.1
 
  - Release containerized image with /count endpoint.
